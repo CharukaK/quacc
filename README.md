@@ -1,2 +1,2 @@
-# quacc: A note taker on the terminal
+# quacc: A note taking tool on the terminal
 

@@ -17,19 +17,21 @@ root/
 ## Command structure
 
 - `quacc` is the root command this will list out the root topics and a list of tags available 
-- `quacc <topic>` `quacc <topic>/<subtopic>` would print out the note in std out
+- `quacc <topic>` `quacc <topic>/<subtopic>` would print out the note in std out, if the note doesn't exist it will
+create a new one 
 - `quacc <topic>~<some text>` by using `~` sign one could search for specific text and tags in the notes
-- `quacc edit <topic>/<subtopic>?` to create and edit notes
+- `quacc <topic> --edit` use the `--edit` flag to edit the note
 
 ## Implementation
 
 ### Base version 
-- [ ] implement the basic editing and viewing document logic 
 - [ ] Configuration system using a file some sort of `.conf` 
+- [ ] implement the basic editing and viewing document logic 
 
 ### Future 
 - [ ] text searching and printing out blocks for quick access
 - [ ] tags
 - [ ] backlinks
 - [ ] Journal/track tasks etc
+
 

@@ -25,13 +25,13 @@ create a new one
 ## Implementation
 
 ### Base version 
-- [ ] Configuration system using a file some sort of `.conf` 
-- [ ] implement the basic editing and viewing document logic 
+- [x] implement the basic editing and viewing document logic 
+- [ ] support journaling 
+- [ ] ability to query notes by keywords and view them
 
 ### Future 
 - [ ] text searching and printing out blocks for quick access
 - [ ] tags
 - [ ] backlinks
-- [ ] Journal/track tasks etc
 
 

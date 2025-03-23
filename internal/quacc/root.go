@@ -1,12 +1,15 @@
 package quacc
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
 
+	"github.com/CharukaK/quacc/internal/quacc/errors"
+	"github.com/charmbracelet/glamour"
 	"github.com/spf13/cobra"
 )
 
@@ -33,9 +36,9 @@ var rootCmd = &cobra.Command{
 			return handleEdit(args)
 		} else {
 			// handle viewing
+			return handleView(args)
 		}
 
-		return nil
 	},
 }
 
@@ -46,12 +49,11 @@ func handleEdit(args []string) error {
 
 	p, _ := parseArguments(args[0])
 
-	fp := path.Join(noteBase, p)
+	fp := fmt.Sprintf(`%s.md`, path.Join(noteBase, p))
 
-	if _, err := os.Stat(p); os.IsNotExist(err) {
-		nFile := fmt.Sprintf(`%s.md`, fp)
-		fmt.Println(nFile)
-		file, err := os.Create(nFile)
+	if _, err := os.Stat(fp); os.IsNotExist(err) {
+		fmt.Println(fp)
+		file, err := os.Create(fp)
 
 		if err != nil {
 			return err
@@ -66,6 +68,40 @@ func handleEdit(args []string) error {
 	cmd.Stderr = os.Stderr
 
 	return cmd.Run()
+}
+
+func handleView(args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("missing arguments")
+	}
+
+	p, _ := parseArguments(args[0])
+	fp := fmt.Sprintf(`%s.md`, path.Join(noteBase, p))
+    fmt.Println(fp)
+	file, err := os.Open(fp)
+
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	buffer := bytes.NewBuffer(make([]byte, 0))
+
+	_, err = buffer.ReadFrom(file)
+
+	if err != nil {
+		return err
+	}
+
+    rc, err := glamour.Render(buffer.String(), "dark")
+
+    if err != nil {
+        return err
+    }
+
+    fmt.Println(rc)
+
+	return nil
 }
 
 func parseArguments(input string) (path string, searchQuery []string) {
@@ -84,8 +120,7 @@ func parseArguments(input string) (path string, searchQuery []string) {
 
 func RunCmd() {
 	if err := rootCmd.Root().Execute(); err != nil {
-		// TODO: Handle error centrally
-		fmt.Println(err.Error())
+		errors.HandleError(err)
 	}
 }
 
@@ -96,7 +131,7 @@ func init() {
 	// todo: make this to be read from a config file later
 
 	if dir, err := setupBaseDir(); err != nil {
-		// todo: handle error
+		errors.HandleError(err)
 	} else {
 		noteBase = dir
 	}

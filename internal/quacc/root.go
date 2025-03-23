@@ -18,7 +18,6 @@ type RootCmdOpts struct {
 }
 
 var cmdOpts = &RootCmdOpts{}
-var noteBase = ""
 var editor = ""
 
 var rootCmd = &cobra.Command{
@@ -49,7 +48,7 @@ func handleEdit(args []string) error {
 
 	p, _ := cmdargs.ParseArguments(args[0])
 
-	fp := fmt.Sprintf(`%s.md`, path.Join(noteBase, p))
+	fp := fmt.Sprintf(`%s.md`, path.Join(fileutils.GetOperatingDir(), p))
 
 	err := fileutils.CreateFileIfNotExists(fp)
 
@@ -57,7 +56,11 @@ func handleEdit(args []string) error {
 		return err
 	}
 
-	cmd := exec.Command(editor, fp)
+	return openEditor(fp)
+}
+
+func openEditor(filePath string) error {
+	cmd := exec.Command(editor, filePath)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -71,7 +74,7 @@ func handleView(opts []string) error {
 	}
 
 	p, _ := cmdargs.ParseArguments(opts[0])
-	fp := fmt.Sprintf(`%s.md`, path.Join(noteBase, p))
+	fp := fmt.Sprintf(`%s.md`, path.Join(fileutils.GetOperatingDir(), p))
 	fmt.Println(fp)
 
 	content, err := fileutils.GetFileContent(fp)
@@ -94,11 +97,8 @@ func init() {
 
 	// set note base
 	// todo: make this to be read from a config file later
-
-	if dir, err := fileutils.SetupBaseDir(); err != nil {
+	if err := fileutils.SetupBaseDir(); err != nil {
 		errors.HandleError(err)
-	} else {
-		noteBase = dir
 	}
 
 	editor, _ = os.LookupEnv("EDITOR")

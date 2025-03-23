@@ -7,6 +7,8 @@ import (
 	"path"
 )
 
+var operatingDir = ""
+
 const baseDir = ".quacc"
 const noteDir = "notes"
 
@@ -36,7 +38,6 @@ func GetFileContent(filePath string) (content string, err error) {
 	buffer := bytes.NewBuffer(make([]byte, 0))
 
 	_, err = buffer.ReadFrom(file)
-
 	if err != nil {
 		return
 	}
@@ -46,26 +47,31 @@ func GetFileContent(filePath string) (content string, err error) {
 	return
 }
 
+func GetOperatingDir() string {
+    return operatingDir
+}
+
 // func GenFilePath(relPath string) string {
 //     if path.Dir()
 // }
 
-func SetupBaseDir() (dir string, err error) {
+func SetupBaseDir() (err error) {
 	usrHome, err := os.UserHomeDir()
-
 	if err != nil {
 		return
 	}
 
-	dir = path.Join(usrHome, baseDir, noteDir)
+	dir := path.Join(usrHome, baseDir, noteDir)
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		err := os.MkdirAll(dir, 0755)
 
 		if err != nil {
-			return "", err
+			return err
 		}
 	}
+
+	operatingDir = dir
 
 	return
 }

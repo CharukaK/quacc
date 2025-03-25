@@ -26,6 +26,7 @@ create a new one
 
 ### Base version 
 - [x] implement the basic editing and viewing document logic 
+- [ ] implement subtopic listing
 - [ ] support journaling 
 - [ ] ability to query notes by keywords and view them
 

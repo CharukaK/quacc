@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 
 	"github.com/CharukaK/quacc/internal/quacc/cmdargs"
 	"github.com/CharukaK/quacc/internal/quacc/errors"
@@ -48,15 +47,12 @@ func handleEdit(args []string) error {
 
 	p, _ := cmdargs.ParseArguments(args[0])
 
-	fp := fmt.Sprintf(`%s.md`, path.Join(fileutils.GetOperatingDir(), p))
-
-	err := fileutils.CreateFileIfNotExists(fp)
-
+	err := fileutils.CreateTopicIfNotExists(p)
 	if err != nil {
 		return err
 	}
 
-	return openEditor(fp)
+	return openEditor(fileutils.GenTopicFilePath(p))
 }
 
 func openEditor(filePath string) error {
@@ -74,11 +70,14 @@ func handleView(opts []string) error {
 	}
 
 	p, _ := cmdargs.ParseArguments(opts[0])
-	fp := fmt.Sprintf(`%s.md`, path.Join(fileutils.GetOperatingDir(), p))
+	fp, err := fileutils.ResolveTopicFilePath(p)
+	if err != nil {
+		return err
+	}
+
 	fmt.Println(fp)
 
 	content, err := fileutils.GetFileContent(fp)
-
 	if err != nil {
 		return err
 	}

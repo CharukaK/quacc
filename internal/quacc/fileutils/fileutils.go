@@ -5,12 +5,63 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 )
 
 var operatingDir = ""
 
 const baseDir = ".quacc"
 const noteDir = "notes"
+const noteSuffix = ".md"
+
+// Todo:
+// - If a topic doesn't exist create the file
+// - If a topic file does exist and it needs a subtopic create a directory for topic and move the file
+
+func CreateTopicIfNotExists(topicPath string) error {
+	topicDir := path.Dir(GenTopicFilePath(topicPath))
+
+	if _, err := os.Stat(topicDir); os.IsNotExist(err) {
+		if err = createDir(topicDir); err != nil {
+			return err
+		}
+
+	}
+
+	fmt.Println(fmt.Sprintf("%s%s", topicDir, noteSuffix))
+
+	if _, err := os.Stat(fmt.Sprintf("%s%s", topicDir, noteSuffix)); err == nil {
+		os.Rename(fmt.Sprintf("%s.md", topicDir), fmt.Sprintf("%s/%s%s", topicDir, path.Base(topicDir), noteSuffix))
+	}
+	return nil
+}
+
+func GenTopicFilePath(topicPath string) string {
+	filePath := fmt.Sprintf("%s/%s", GetOperatingDir(), topicPath)
+	if !strings.HasSuffix(topicPath, noteSuffix) {
+		filePath += noteSuffix
+	}
+
+	return filePath
+}
+
+func ResolveTopicFilePath(topicPath string) (string, error) {
+	tp := GenTopicFilePath(topicPath)
+
+	if _, err := os.Stat(tp); os.IsNotExist(err) {
+		base := path.Base(topicPath)
+
+		tp := GenTopicFilePath(fmt.Sprintf("%s/%s", topicPath, base))
+
+		if _, err := os.Stat(tp); os.IsNotExist(err) {
+			return "", err
+		}
+
+		return tp, nil
+	}
+
+	return tp, nil
+}
 
 func CreateFileIfNotExists(filePath string) error {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
@@ -48,7 +99,7 @@ func GetFileContent(filePath string) (content string, err error) {
 }
 
 func GetOperatingDir() string {
-    return operatingDir
+	return operatingDir
 }
 
 // func GenFilePath(relPath string) string {
@@ -63,15 +114,23 @@ func SetupBaseDir() (err error) {
 
 	dir := path.Join(usrHome, baseDir, noteDir)
 
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		err := os.MkdirAll(dir, 0755)
+	if err = createDir(dir); err != nil {
+		return err
+	}
+
+	operatingDir = dir
+
+	return
+}
+
+func createDir(dirPath string) error {
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		err := os.MkdirAll(dirPath, 0755)
 
 		if err != nil {
 			return err
 		}
 	}
 
-	operatingDir = dir
-
-	return
+	return nil
 }

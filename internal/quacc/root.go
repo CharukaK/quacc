@@ -75,8 +75,6 @@ func handleView(opts []string) error {
 		return err
 	}
 
-	fmt.Println(fp)
-
 	content, err := fileutils.GetFileContent(fp)
 	if err != nil {
 		return err

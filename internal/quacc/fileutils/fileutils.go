@@ -45,6 +45,34 @@ func GenTopicFilePath(topicPath string) string {
 	return filePath
 }
 
+func GetTopicListForCompletion(p string) ([]string, error) {
+	result := make([]string, 0)
+
+	testPath := path.Join(GetOperatingDir(), p)
+
+	files, err := os.ReadDir(testPath)
+	if os.IsNotExist(err) {
+		testPath = path.Dir(testPath)
+		files, err = os.ReadDir(testPath)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	relPath := strings.TrimPrefix(testPath, GetOperatingDir())
+	relPath = strings.TrimPrefix(relPath, string(os.PathSeparator))
+	for _, file := range files {
+		if file.IsDir() {
+			result = append(result, path.Join(relPath, file.Name()))
+		} else {
+			result = append(result, path.Join(relPath, strings.TrimSuffix(file.Name(), path.Ext(file.Name()))))
+		}
+	}
+
+	return result, nil
+}
+
 func ResolveTopicFilePath(topicPath string) (string, error) {
 	tp := GenTopicFilePath(topicPath)
 

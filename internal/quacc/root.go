@@ -8,7 +8,6 @@ import (
 	"github.com/CharukaK/quacc/internal/quacc/cmdargs"
 	"github.com/CharukaK/quacc/internal/quacc/errors"
 	"github.com/CharukaK/quacc/internal/quacc/fileutils"
-	"github.com/CharukaK/quacc/internal/quacc/logger"
 	"github.com/CharukaK/quacc/internal/quacc/render"
 	"github.com/spf13/cobra"
 )
@@ -49,8 +48,6 @@ func argCompletionFunc(
 ) (comps []cobra.Completion, directive cobra.ShellCompDirective) {
 	directive = cobra.ShellCompDirectiveNoSpace
 	comps, _ = fileutils.GetTopicListForCompletion(toComplete)
-	logger.Info("to complete >>>", toComplete)
-	logger.Info("dir list >>>", fmt.Sprint("%v", comps))
 	return
 }
 
